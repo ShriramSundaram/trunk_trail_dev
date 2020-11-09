@@ -10,10 +10,25 @@ from kivy.graphics import Color, Canvas, Rectangle
 from kivy.config import Config
 import random
 
+"""
+Current Config settings is only applicable for Windows Application.
+For Mobile App, config settings have to be modified
+"""
 Config.set('graphics', 'width', '1000')
 
 
 class UiDesign(GridLayout):
+    """
+        UiDesign is a class, which inherits a another class of GridLayout.
+        UiDesign has following methods:
+                -- __Init__ : This method basically initialize the UiDesign with basic set of parameters.
+                Main function is to open the already saved GermanWords file, set up the Grid the Size,Color,Shape
+                and Adding Buttons,Display Text on to the screen
+                -- start_german_word :
+                -- reminder_delay :
+                -- hold_prev_german_word:
+                -- adding_new_word:
+    """
     def __init__(self, **kwargs):
         super(UiDesign, self).__init__(**kwargs)
         with self.canvas:
@@ -58,7 +73,8 @@ class UiDesign(GridLayout):
         self.submit_button.bind(on_press=self.reminder_delay)
         self.add_widget(self.submit_button)
 
-        self.start_button = Button(text="Start / Reset", background_normal="German_BG_1.JPG", background_color=(0.2, 1, 0.5, 2),
+        self.start_button = Button(text="Start / Reset", background_normal="German_BG_1.JPG",
+                                   background_color=(0.2, 1, 0.5, 2),
                                    size_hint=(None, None), size=(150, 50), pos_hint={"x": 0.5, "y": 0.3})
         self.start_button.bind(on_press=self.start_german_word)
         self.add_widget(self.start_button)
@@ -68,11 +84,23 @@ class UiDesign(GridLayout):
         self.rect.size = self.size
 
     def start_german_word(self, instance):
+        """
+
+        :param instance: is created when the Start Button is pressed
+        :return: Display new random word on to the screen
+        """
         random.shuffle(self.german_new_words)
         self.save = random.choice(self.german_new_words)
         self.inside.display_label.text = "\n" + self.save
 
     def reminder_delay(self, instance):
+        """
+
+        :param instance: is created when Submit Button is Pressed
+        :return: It sets wait time for particular displayed
+        word. For Eg: Warten is displayed word, set the Reminder Time and once the Submit button is pressed.
+        Reminder Time is applicable to current displayed word.
+        """
         self.inside.display_label.text = ""
         hrs_in_sec = 0
         min_in_sec = 0
@@ -87,9 +115,14 @@ class UiDesign(GridLayout):
                 sec = int(delay_time)
             self.total_time_in_sec = hrs_in_sec + min_in_sec + sec
             print(self.total_time_in_sec)
-        Clock.schedule_once(self.hold_previous_german_word, self.total_time_in_sec)
+        Clock.schedule_once(self.hold_prev_german_word, self.total_time_in_sec)
 
-    def hold_previous_german_word(self, instance):
+    def hold_prev_german_word(self, instance):
+        """
+
+        :param instance: is created after Submit Button is pressed
+        :return: Reminder word in a pop-up message.
+        """
         popup_layout = GridLayout(cols=1, padding=50)
         popup_layout.add_widget(Label(text=self.save, font_size="25sp", italic=True))
         close_button = Button(text="Close", size_hint=(0.5, 0.5), background_color=(2, 1, 0.5, 2))
@@ -101,6 +134,12 @@ class UiDesign(GridLayout):
         close_button.bind(on_press=popup.dismiss)
 
     def adding_new_word(self, instance):
+        """
+
+        :param instance: is created after Add New Word Button is pressed
+        :return: Adds new word to existing list of words, only if it is a new word
+        """
+
         if (self.inside.user_input_new_word.text + "\n") not in self.german_new_words:
             self.german_new_words.append(self.inside.user_input_new_word.text)
             file = open("GermanWords", "a")
@@ -115,6 +154,11 @@ class UiDesign(GridLayout):
 
 class ReminderApplication(App):
     def build(self):
+        """
+        Purpose of this Application is to remind a German Word, after few seconds or 1h or 24h or ..
+        It allows user to add new words
+        :return:
+        """
         return UiDesign()
 
 
